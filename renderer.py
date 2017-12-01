@@ -5,7 +5,13 @@ import curses
 from curses import wrapper
 from time import sleep
 
-testMap = ["####", "#..#", "#..#", "####"]
+testMap = ["vvvv", "wwww", "wffw", "wffd", "wwww"]
+TILE_MAP = {
+    "v": " ",
+    "w": "#",
+    "f": ".",
+    "d": "?",
+}
 
 class Renderer(object):
     def __init__(self):
@@ -22,9 +28,9 @@ class Renderer(object):
             exit()
         curses.curs_set(False)
         self.stdscr = stdscr
-        x, y = 1, 1
+        x, y = 1, 2
         while True:
-            self.draw_map(testMap, (x, y), [(2, 2, "E")])
+            self.draw_map(testMap, (x, y), [(2, 3, "E")])
             in_ = self.input()
             if in_ == "KEY_UP":
                 y -= 1
@@ -45,7 +51,7 @@ class Renderer(object):
         x, y = position
         width, height = len(map_[0]), len(map_)
         mappad = curses.newpad(height, width + 1)
-        mappad.addstr('\n'.join(''.join(line) for line in map_))
+        mappad.addstr('\n'.join(''.join(TILE_MAP[char] for char in line) for line in map_))
         x_offset, y_offset = max(x - display_x, 0), max(y - display_y, 0)
         x_pos, y_pos = max(display_x - x, 0), max(display_y - y, 0)
         x_end = min(curses.COLS, width + x_pos)
