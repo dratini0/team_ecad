@@ -4,6 +4,7 @@
 import curses
 from curses import wrapper
 from time import sleep
+import procedural_generation
 
 testMap = ["vvvv", "wwww", "wffw", "wffd", "wwww"]
 TILE_MAP = {
@@ -28,20 +29,7 @@ class Renderer(object):
             exit()
         curses.curs_set(False)
         self.stdscr = stdscr
-        x, y = 1, 2
-        while True:
-            self.draw_map(testMap, (x, y), [(2, 3, "E")])
-            in_ = self.input()
-            if in_ == "KEY_UP":
-                y -= 1
-            elif in_ == "KEY_DOWN":
-                y += 1
-            elif in_ == "KEY_LEFT":
-                x -= 1
-            elif in_ == "KEY_RIGHT":
-                x += 1
-            elif in_ == "q":
-                break
+        procedural_generation.main(self)
 
     def draw_map(self, map_, position, enemies):
         self.stdscr.clear()
