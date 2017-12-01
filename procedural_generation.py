@@ -14,8 +14,34 @@ ROOM_HEIGHT_MIN = 7
 ROOM_HEIGHT_MAX = 15
 CORRIDOR_LENGTH_MIN = 3
 CORRIDOR_LENGTH_MAX = 10
+MONSTER_SPAWN_RATE = 5 #percentage
 
 
+def add_two_lists(list1, list2):
+    assert(len(list1) == len(list2))
+    output = []
+    for i in range(len(list1)):
+        output.append(list1[i] + list2[i])
+    return output
+
+def put_2d_list_into_other_2d_list(renderer, small_list, big_list, start_pos):
+    # start_pos is a list with the x and y coord in the big list where the small list should start
+    assert(len(big_list) > len(small_list))
+    assert(len(big_list[0]) > len(small_list[0]))
+
+    small_list_counter_x = 0
+    small_list_counter_y = 0
+    for y in range(start_pos[1], start_pos[1] + len(small_list)):
+        for x in range(start_pos[0], start_pos[0] + len(small_list[0])):
+            renderer.print('Changing element: ', x, ' ', y)
+            renderer.print('With small list counters: ', small_list_counter_x, ' ', small_list_counter_y)
+            big_list[y][x] = small_list[small_list_counter_y][small_list_counter_x]
+            small_list_counter_x += 1
+
+        small_list_counter_x = 0
+        small_list_counter_y += 1
+
+        
 
 def create_room(width, height):
     # Returns a 2d list with the room
@@ -44,7 +70,35 @@ def create_room(width, height):
     room[height_middle][0] = 'd'
     room[height_middle][width -1 ] = 'd'
 
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            if random.randrange(1, 100) < MONSTER_SPAWN_RATE:
+                room[y][x] = str(random.randrange(1, 9))
+
     return room
+
+def create_corridor(length, orientation):
+    # Returns a 2d list with the corridor which is two walls and one floor
+    # Orientation is 'horizontal' or 'vertical'
+    corridor = []
+
+    if orientation == 'horizontal':
+        wall_row = []
+        floor_row = []
+        for i in range(length):
+            wall_row.append('w')
+            floor_row.append('f')
+        corridor.append(wall_row)
+        corridor.append(floor_row)
+        corridor.append(wall_row)
+
+    elif orientation == 'vertical':
+        row = ['w', 'f', 'w']
+        for i in range(length):
+            corridor.append(row)
+
+    return corridor
+            
 
 def print_map(inp_map, inp_char_pos):
     #inp_map is a 2d list with characters representing the map state in each element
@@ -57,25 +111,34 @@ def print_map(inp_map, inp_char_pos):
 
     inp_map[inp_char_pos[1]][inp_char_pos[0]] = old_map_value
 
+def print_2d_list(renderer, inp_list):
+    for y in range(len(inp_list)):
+        renderer.print(inp_list[y]) 
+
 def get_input(renderer):
     return renderer.input()
 
-def check_destination(movement_vector, inp_map, current_player_pos):
+def check_destination(renderer, movement_vector, inp_map, current_player_pos):
     # returns the character of the destination on the map
+    if len(inp_map) == 0:
+        renderer.print('procedural generation::check_destination given empty map')
+
     destination = []
     destination.append(current_player_pos[0] + movement_vector[0])
     destination.append(current_player_pos[1] + movement_vector[1])
     return inp_map[destination[1]][destination[0]]
 
-def check_collision(movement_vector, inp_map, current_player_pos):
+def check_collision(renderer, movement_vector, inp_map, current_player_pos):
     # false for no collision, true for collision
-    return not(check_destination(movement_vector, inp_map, current_player_pos) == 'f')
+    return not(check_destination(renderer, movement_vector, inp_map, current_player_pos) == 'f')
 
-def extend_map_in_direction(direction, length, inp_map, start_pos):
+def extend_map_in_direction(renderer, direction, length, inp_map, start_pos):
     #Checks if the map is defined in the direction given
     # direction is string 'left', 'right', 'up', 'down'
     # length is int. Does not include the start_pos in the count
     # start_pos is list of 2 elements, x and y coord
+
+    renderer.print('procedural_generation::extend_map_in_direction started', 'direction: ', direction, ' length: ', length, ' is inp_map empty: ', len(inp_map)==0, ' start_pos: ', start_pos)
 
     new_map = []
     char_pos_change_vector = [] # The vector which is to be added to the character position to keep them in the correct position on the map
@@ -93,6 +156,9 @@ def extend_map_in_direction(direction, length, inp_map, start_pos):
             # Add the addition to the start of each row in the new map
             for i in range(len(inp_map)):
                 new_map.append(list_addition + inp_map[i])
+
+        else:
+            new_map = inp_map
     elif direction == 'right':
         if start_pos[0] + length >= len(inp_map[0]):
             list_addition = []
@@ -101,6 +167,8 @@ def extend_map_in_direction(direction, length, inp_map, start_pos):
 
             for i in range(len(inp_map)):
                 new_map.append(inp_map[i] + list_addition)
+        else:
+            new_map = inp_map
 
     elif direction == 'up':
         if start_pos[1] - length < 0:
@@ -113,9 +181,12 @@ def extend_map_in_direction(direction, length, inp_map, start_pos):
                 char_pos_change_vector[1] += 1
             for i in range(len(inp_map)):
                 new_map.append(inp_map[i])
+        else:
+            new_map = inp_map
 
     elif direction == 'down':
         if start_pos[1] + length >=len(inp_map):
+            renderer.print('Adding new lines down')
             list_addition = []
             for i in range(len(inp_map[0])):
                 list_addition.append('v')
@@ -124,20 +195,36 @@ def extend_map_in_direction(direction, length, inp_map, start_pos):
                 new_map.append(inp_map[i])
             for i in range(start_pos[1] + length - len(inp_map) + 1):
                 new_map.append(list_addition)
+                renderer.print('Added a line at the bottom')
+        else:
+            renderer.print('start_pos[1]: ', start_pos[1], ' length: ', length, ' len(inp_map): ', len(inp_map))
+            renderer.print('Down does not need to add new lines')
+            new_map = inp_map
 
-
+    renderer.print('procedural_generation::extend_map_in_direction returning empty map?: ', len(new_map) == 0)
     return (new_map, char_pos_change_vector)
                 
         
     
+def check_if_void(renderer, inp_map, search_box_top_left, search_box_bottom_right):
+    #Returns true if all the elements in the search boxes are void and false if not
+    for y in range(search_box_top_left[1], search_box_bottom_right[1] + 1):
+        for x in range(search_box_top_left[0], search_box_bottom_right[0] + 1):
+            if not (inp_map[y][x] == 'v'):
+                return False
+    return True
 
-def add_new_room(door_location, inp_map):
+def add_new_room(renderer, door_location, inp_map):
     #Create a new room spawning off the door location
     #Will do nothing if there is not enough space
+
+    renderer.print('procedural_generation::add_new_room started', ' door_location: ', door_location, ' is inp_map empty: ', len(inp_map)==0)
 
     #Find the direction in which the new room is spawned
     door_orientation = '' #Either up, down, left, right
     char_pos_change_vector = []
+    char_pos_change_vector.append(0)
+    char_pos_change_vector.append(0)
 
     if door_location[0] == 0:
         door_orientation = 'left' 
@@ -164,18 +251,84 @@ def add_new_room(door_location, inp_map):
     new_room_width = random.randrange(ROOM_WIDTH_MIN, ROOM_WIDTH_MAX)
     new_room_height = random.randrange(ROOM_HEIGHT_MIN, ROOM_HEIGHT_MAX)
 
+    step_change_vector= []
+    step_change_vector.append(0)
+    step_change_vector.append(0)
+
     if door_orientation == 'left':
-        # inp_map, char_pos_change_vector = extend_map_in_direction('left', corridor_length + new_room_width, inp_map, door_location)
-        inp_map, char_pos_change_vector = extend_map_in_direction('left', 4, inp_map, door_location)
+        #Make space for the new room
+
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'left', corridor_length + new_room_width, inp_map, door_location)
+        char_pos_change_vector = add_two_lists(char_pos_change_vector, step_change_vector)
+        door_location = add_two_lists(door_location, step_change_vector)
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'up', new_room_height, inp_map, door_location)
+        char_pos_change_vector = add_two_lists(char_pos_change_vector, step_change_vector)
+        door_location = add_two_lists(door_location, step_change_vector)
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'down', new_room_height, inp_map, door_location)
+        char_pos_change_vector = add_two_lists(char_pos_change_vector, step_change_vector)
+        door_location = add_two_lists(door_location, step_change_vector)
+        
+        
+        #Check whether the new room intersects an existing room
+
+        search_box_top_left = [door_location[0] - new_room_width - corridor_length, door_location[1] - int(new_room_height/2) - 1]
+        search_box_bottom_right = [door_location[0] - 1, door_location[1] + int(new_room_height/2) + 1]
+        if check_if_void(renderer, inp_map, search_box_top_left, search_box_bottom_right):
+            # Add the corridor and room
+            renderer.print('There is space to the left for a new room')
+            corridor = create_corridor(corridor_length, 'horizontal')
+            corridor_start_top_left_x = door_location[0] - corridor_length
+            corridor_start_top_left_y = door_location[1] - 1
+            put_2d_list_into_other_2d_list(renderer, corridor, inp_map, [corridor_start_top_left_x, corridor_start_top_left_y]) 
+            inp_map[door_location[1]][door_location[0]] = 'f'
+
+            room = create_room(new_room_width, new_room_height)
+            room_start_top_left_x = door_location[0] - corridor_length - new_room_width
+            room_start_top_left_y = door_location[1] - int(new_room_height/2)
+            put_2d_list_into_other_2d_list(renderer, room, inp_map, [room_start_top_left_x, room_start_top_left_y])
+
+            inp_map[door_location[1]][door_location[0] - corridor_length - 1] = 'f'
+        else:
+            renderer.print('There is no space to the left for a new room')
+
+
+
+
     elif door_orientation == 'right':
-        inp_map, char_pos_change_vector = extend_map_in_direction('right', 4, inp_map, door_location)
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'right', 4, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'up', new_room_height, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'down', new_room_height, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
     elif door_orientation == 'up':
-        inp_map, char_pos_change_vector = extend_map_in_direction('up', 4, inp_map, door_location)
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'up', 4, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'left', new_room_width, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'right', new_room_width, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
     elif door_orientation == 'down':
-        inp_map, char_pos_change_vector = extend_map_in_direction('down', 4, inp_map, door_location)
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'down', 4, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'left', new_room_width, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+        inp_map, step_change_vector = extend_map_in_direction(renderer, 'right', new_room_width, inp_map, door_location)
+        char_pos_change_vector[0] += step_change_vector[0]
+        char_pos_change_vector[1] += step_change_vector[1]
+
+
         
     if len(inp_map) == 0:
-        print('add_new_room returning 0 length inp_map')
+        renderer.print('add_new_room returning 0 length inp_map')
     return (inp_map, char_pos_change_vector)
         
 def main(renderer):
@@ -183,8 +336,8 @@ def main(renderer):
 
 
     #create the starting room
-    starting_room_width = random.randrange(7, 10)
-    starting_room_height = random.randrange(7, 10)
+    starting_room_width = random.randrange(15, 20)
+    starting_room_height = random.randrange(15, 20)
     g_map = create_room(starting_room_width, starting_room_height)
 
     #place the character
@@ -192,7 +345,6 @@ def main(renderer):
     char_pos.append(int(starting_room_width/2))
     char_pos.append(int(starting_room_height/2))
 
-    print_map(g_map, char_pos)
 
     while(1):
         player_input = get_input(renderer)
@@ -210,17 +362,32 @@ def main(renderer):
             movement_vector.append(1)
             movement_vector.append(0)
         else:
-            print('unexpected key: ', player_input)
+            renderer.print('unexpected key: ', player_input)
 
-        if check_destination(movement_vector, g_map, char_pos) == 'd':
+        destination_char = check_destination(renderer, movement_vector, g_map, char_pos)
+
+        if check_destination(renderer, movement_vector, g_map, char_pos) == 'd':
             door_location = []
             door_location.append(char_pos[0] + movement_vector[0])
             door_location.append(char_pos[1] + movement_vector[1])
-            g_map, char_pos_change_vector = add_new_room(door_location, g_map) 
+            g_map, char_pos_change_vector = add_new_room(renderer, door_location, g_map) 
             char_pos[0] += char_pos_change_vector[0]
             char_pos[1] += char_pos_change_vector[1]
 
-        if not(check_collision(movement_vector, g_map, char_pos)):
+        is_dest_monster = False
+        try:
+            int(destination_char)
+            is_dest_monster = True
+        except:
+            dummy = 0
+        
+        if is_dest_monster:
+            renderer.print('*******Battle start')
+        #************************************
+        #Call battle function here
+        #************************************
+
+        if not(check_collision(renderer, movement_vector, g_map, char_pos)):
             char_pos[0] += movement_vector[0]
             char_pos[1] += movement_vector[1]
 
