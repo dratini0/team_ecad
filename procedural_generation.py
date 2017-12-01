@@ -345,10 +345,10 @@ def main(renderer):
     char_pos.append(int(starting_room_height/2))
 
     #place some monsters
-    for y in range(len(g_map) - 1):
-        for x in range(len(g_map[0]) - 1):
+    for y in range(1, len(g_map) - 1):
+        for x in range(1 ,len(g_map[0]) - 1):
             if random.randrange(1, 100) < 20:
-                g_map[y][x] = random.randrange(1,9)
+                g_map[y][x] = str(random.randrange(1,9))
 
     while(1):
         player_input = get_input(renderer)
@@ -368,6 +368,8 @@ def main(renderer):
         else:
             renderer.print('unexpected key: ', player_input)
 
+        destination_char = check_destination(renderer, movement_vector, g_map, char_pos)
+
         if check_destination(renderer, movement_vector, g_map, char_pos) == 'd':
             dummy = 1
             # door_location = []
@@ -376,6 +378,18 @@ def main(renderer):
             # g_map, char_pos_change_vector = add_new_room(renderer, door_location, g_map) 
             # char_pos[0] += char_pos_change_vector[0]
             # char_pos[1] += char_pos_change_vector[1]
+        is_dest_monster = False
+        try:
+            int(destination_char)
+            is_dest_monster = True
+        except:
+            dummy = 0
+        
+        if is_dest_monster:
+            renderer.print('*******Battle start')
+        #************************************
+        #Call battle function here
+        #************************************
 
         if not(check_collision(renderer, movement_vector, g_map, char_pos)):
             char_pos[0] += movement_vector[0]
