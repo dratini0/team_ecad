@@ -8,6 +8,7 @@ Created on Fri Dec  1 12:33:08 2017
 import numpy as np
 import random
 import math
+from time import sleep
 
 renderer = None
 
@@ -44,7 +45,9 @@ class Player(object):
         if self.Player_HP<=0:
             self.game_over = True
             self.Player_HP = 0
-            renderer.battle_print("The room starts to go dark, as you collapse to the ground, blood seeping out through the cracks in your armour. Game Over")
+            renderer.battle_print("The room starts to go dark, as you collapse to the ground, blood seeping out")
+            renderer.battle_print("through the cracks in your armour. Game Over")
+            sleep(1)
             renderer.die_self()
             
     def Player_strike(self, Move, Monster):
@@ -134,7 +137,7 @@ Bite = Move("bite.png", "bite", 3, 0.8, "attack", 0.01)
 
 Slash = Move("slash.png", "slash", 10, 0.9, "attack", 0.05)
 Stab = Move("slash.png", "stab", 20, 0.5, "attack", 0.2)
-Punch = Move("punch.png", "punch", 3 , 1, "attack", 0.5)
+Punch = Move("punch.png", "punch", 300 , 1, "attack", 0.5)
 
 Run = Move("run.png", "run", 0 , 0, "run", 0)
 Evade = Move("evade.png", "evade", 1, 1, "dodge", 0.01)
@@ -163,14 +166,14 @@ lag_spike = Move("","Lag Spike",7.0,0.6,"attack",0.005)
 obseletion = Move("","Obsoletion",30.0,0.5,"attack",0.1)
 strum = Move("","Strum",0.0,1.0,"attack",0.0)
 
-rat = Monster("rat.pbm","Rat",20,0,0.1,0.6,0.4,[(Bite,0.4),(scratch,0.2),(gnaw,0.4)])
+rat = Monster("rat.pbm","Rat",20,0,0.1,0.6,0.4,[(Bite,0.4),(scratch,0.2),(gnaw,0.4),(gnaw,0.0)])
 bug = Monster("insect.pbm","B.U.G",50,0,0.3,0.8,0.2,[(syntax_error,0.25),(unfound_function,0.25),(bracket_expected,0.4),(Bite,0.1)])
 chrome = Monster("ball.pbm","ChrDome",100,0,0.5,0.5,0.2,[(rapid_strike,0.25),(energy_ball,0.4),(bump,0.25),(googol_strikes,0.1)])
 firefox = Monster("firefox.pbm","Firefox",100,0,0.3,0.7,0.6,[(fire_breath,0.4),(tail_whip,0.2),(scratch,0.3),(mozilla_killa,0.1)])
 adder = Monster("deathadder.pbm","Adder",120,0,0.1,0.7,0.3,[(bump,0.2),(chroma,0.4),(laser_beam,0.3),(razer_storm,0.1)])
 clippy = Monster("clippy.pbm","Nightmare",150,0,0.25,0.5,0.2,[(suggestion,0.4),(bump,0.2),(glare,0.3),(is_this_a_letter,0.1)])
 explorer = Monster("explorer.pbm","Explorer",80,0,0.1,0.4,0.1,[(lag_spike,0.4),(scratch,0.2),(gnaw,0.3),(obseletion,0.1)])
-harp = Monster("magicharp.pbm","MagicHarp",1000,0,0.5,0.9,0.5,[(strum,1.0),(scratch,0.0),(gnaw,0.0)])
+harp = Monster("magicharp.pbm","MagicHarp",1000,0,0.5,0.9,0.5,[(strum,1.0),(scratch,0.0),(gnaw,0.0),(gnaw,0.0)])
 
 def select_attack(Player):
     # print("")

@@ -29,7 +29,7 @@ TILE_MAP = {
 SELF_SPRITE = "player.pbm"
 SELF_NAME = "You"
 
-TEXTBOX_HEIGHT = 3
+TEXTBOX_HEIGHT = 5
 
 BATTLE_WIDTH = 80
 BATTLE_HEIGHT = 24
@@ -209,14 +209,14 @@ class Renderer(object):
         message = ''.join(message)
         self.battlemessagebox.move(0, 0)
         self.battlemessagebox.deleteln()
-        self.battlemessagebox.move(2, 0)
+        self.battlemessagebox.move(TEXTBOX_HEIGHT - 1, 0)
         self.battlemessagebox.addstr(message)
         self.battlemessagebox.refresh()
 
     def battle_input(self, prompt):
         self.battlemessagebox.move(0, 0)
         self.battlemessagebox.deleteln()
-        self.battlemessagebox.move(2, 0)
+        self.battlemessagebox.move(TEXTBOX_HEIGHT - 1, 0)
         self.battlemessagebox.addstr(prompt)
         self.battlemessagebox.refresh()
         curses.curs_set(1)
