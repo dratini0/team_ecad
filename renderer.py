@@ -6,6 +6,7 @@ from curses import wrapper
 from time import sleep
 import procedural_generation
 
+import battle
 import blockdraw
 
 testMap = ["vvvv", "wwww", "wffw", "wffd", "wwww"]
@@ -52,14 +53,7 @@ class Renderer(object):
             exit()
         curses.curs_set(False)
         self.stdscr = stdscr
-
-        self.start_battle("Insect", "insect.pbm", 100, 75, 100, 65)
-        self.battle_print("asd1")
-        self.battle_print("asd2")
-        self.battle_print("3")
-        self.battle_print(self.battle_in("? "))
-        sleep(1)
-
+        battle.fight(battle.PLAYER, battle.strong_rat, self)
         procedural_generation.main(self)
 
     def draw_map(self, map_, position, enemies):
@@ -92,6 +86,8 @@ class Renderer(object):
         return self.stdscr.getkey()
 
     def start_battle(self, enemy_name, enemy_sprite, self_max_hp, self_hp, enemy_max_hp, enemy_hp):
+        self_hp = int(self_hp)
+        enemy_hp = int(enemy_hp)
         curses.newwin(BATTLE_HEIGHT, BATTLE_WIDTH, 0, 0).noutrefresh()
         self.battlemessagebox = curses.newwin(TEXTBOX_HEIGHT, BATTLE_WIDTH, BATTLE_HEIGHT - TEXTBOX_HEIGHT, 0)
         self.battlemessagebox.noutrefresh()
@@ -173,41 +169,42 @@ class Renderer(object):
         infobox.noutrefresh()
 
     def damage_enemy(self, new_hp):
-        self.enemy_hp = new_hp
+        self.enemy_hp = int(new_hp)
         self.render_enemy()
         curses.doupdate()
 
     def damage_self(self, new_hp):
-        self.self_hp = new_hp
+        self.self_hp = int(new_hp)
         self.render_self()
         curses.doupdate()
 
     def help_enemy(self, new_hp):
-        self.enemy_hp = new_hp
+        self.enemy_hp = int(new_hp)
         self.render_enemy()
         curses.doupdate()
 
     def heal_self(self, new_hp):
-        self.self_hp = new_hp
+        self.self_hp = int(new_hp)
         self.render_self()
         curses.doupdate()
 
-    def die_enemy(self, new_hp):
+    def die_enemy(self):
         pass
 
-    def die_self(self, new_hp):
+    def die_self(self):
         pass
 
 
 
-    def battle_print(self, message):
+    def battle_print(self, *message):
+        message = ''.join(message)
         self.battlemessagebox.move(0, 0)
         self.battlemessagebox.deleteln()
         self.battlemessagebox.move(2, 0)
         self.battlemessagebox.addstr(message)
         self.battlemessagebox.refresh()
 
-    def battle_in(self, prompt):
+    def battle_input(self, prompt):
         self.battlemessagebox.move(0, 0)
         self.battlemessagebox.deleteln()
         self.battlemessagebox.move(2, 0)
@@ -218,7 +215,8 @@ class Renderer(object):
         result = self.battlemessagebox.getstr()
         curses.noecho()
         curses.curs_set(0)
-        return result
+        self.print(repr(result))
+        return result.decode("utf-8").strip()
 
 if __name__ == "__main__":
     Renderer().run()
