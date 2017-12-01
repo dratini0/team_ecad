@@ -4,6 +4,7 @@
 import curses
 from curses import wrapper
 from time import sleep
+import procedural_generation
 
 import blockdraw
 
@@ -51,13 +52,15 @@ class Renderer(object):
             exit()
         curses.curs_set(False)
         self.stdscr = stdscr
-        x, y = 1, 2
+
         self.start_battle("Insect", "insect.pbm", 100, 75, 100, 65)
         self.battle_print("asd1")
         self.battle_print("asd2")
         self.battle_print("3")
         self.battle_print(self.battle_in("? "))
         sleep(1)
+
+        procedural_generation.main(self)
 
     def draw_map(self, map_, position, enemies):
         self.stdscr.clear()
