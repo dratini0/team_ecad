@@ -8,7 +8,7 @@ import procedural_generation
 
 testMap = ["vvvv", "wwww", "wffw", "wffd", "wwww"]
 TILE_MAP = {
-    "v": " ",
+    "v": "v",
     "w": "#",
     "f": ".",
     "d": "?",
