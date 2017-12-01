@@ -165,12 +165,12 @@ strum = Move("","Strum",0.0,1.0,"attack",0.0)
 
 rat = Monster("rat.pbm","Rat",20,0,0.1,0.6,0.4,[(Bite,0.4),(scratch,0.2),(gnaw,0.4)])
 bug = Monster("insect.pbm","B.U.G",50,0,0.3,0.8,0.2,[(syntax_error,0.25),(unfound_function,0.25),(bracket_expected,0.4),(Bite,0.1)])
-chrome = Monster("ball.pbm","Chrome Dome",100,0,0.5,0.5,0.2,[(rapid_strike,0.25),(energy_ball,0.4),(bump,0.25),(googol_strikes,0.1)])
+chrome = Monster("ball.pbm","ChrDome",100,0,0.5,0.5,0.2,[(rapid_strike,0.25),(energy_ball,0.4),(bump,0.25),(googol_strikes,0.1)])
 firefox = Monster("firefox.pbm","Firefox",100,0,0.3,0.7,0.6,[(fire_breath,0.4),(tail_whip,0.2),(scratch,0.3),(mozilla_killa,0.1)])
-adder = Monster("deathadder.pbm","Deathadder",120,0,0.1,0.7,0.3,[(bump,0.2),(chroma,0.4),(laser_beam,0.3),(razer_storm,0.1)])
+adder = Monster("deathadder.pbm","Adder",120,0,0.1,0.7,0.3,[(bump,0.2),(chroma,0.4),(laser_beam,0.3),(razer_storm,0.1)])
 clippy = Monster("clippy.pbm","Nightmare",150,0,0.25,0.5,0.2,[(suggestion,0.4),(bump,0.2),(glare,0.3),(is_this_a_letter,0.1)])
-explorer = Monster("explorer.pbm","Intrepid Explorer",80,0,0.1,0.4,0.1,[(lag_spike,0.4),(scratch,0.2),(gnaw,0.3),(obseletion,0.1)])
-harp = Monster("magicharp.pbm","Magic Harp",1000,0,0.5,0.9,0.5,[(strum,1.0),(scratch,0.0),(gnaw,0.0)])
+explorer = Monster("explorer.pbm","Explorer",80,0,0.1,0.4,0.1,[(lag_spike,0.4),(scratch,0.2),(gnaw,0.3),(obseletion,0.1)])
+harp = Monster("magicharp.pbm","MagicHarp",1000,0,0.5,0.9,0.5,[(strum,1.0),(scratch,0.0),(gnaw,0.0)])
 
 def select_attack(Player):
     # print("")

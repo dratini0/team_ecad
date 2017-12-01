@@ -6,6 +6,7 @@
 
 import random
 import numpy
+import battle
 
 
 ROOM_WIDTH_MIN = 7
@@ -16,6 +17,19 @@ CORRIDOR_LENGTH_MIN = 3
 CORRIDOR_LENGTH_MAX = 10
 MONSTER_SPAWN_RATE = 5 #percentage
 
+
+monsterlist = [
+    None,
+    battle.rat,
+    battle.bug,
+    battle.chrome,
+    battle.firefox,
+    battle.adder,
+    battle.clippy,
+    battle.explorer,
+    battle.harp,
+    battle.rat,
+]
 
 def add_two_lists(list1, list2):
     assert(len(list1) == len(list2))
@@ -383,9 +397,8 @@ def main(renderer):
         
         if is_dest_monster:
             renderer.print('*******Battle start')
-        #************************************
-        #Call battle function here
-        #************************************
+            battle.fight(battle.PLAYER, monsterlist[int(destination_char)], renderer)
+
 
         if not(check_collision(renderer, movement_vector, g_map, char_pos)):
             char_pos[0] += movement_vector[0]
