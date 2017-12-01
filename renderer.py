@@ -53,7 +53,7 @@ class Renderer(object):
             exit()
         curses.curs_set(False)
         self.stdscr = stdscr
-        battle.fight(battle.PLAYER, battle.strong_rat, self)
+        # battle.fight(battle.PLAYER, battle.rat, self)
         procedural_generation.main(self)
 
     def draw_map(self, map_, position, enemies):
